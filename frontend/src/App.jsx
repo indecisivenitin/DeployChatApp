@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 
-import Navbar from './components/NavBar'
+import Navbar from './components/Navbar'
 import HomePage from "./pasges/HomePage";
 import SignupPage from './pasges/SignupPage';
 import LoginPage from './pasges/LoginPage';
