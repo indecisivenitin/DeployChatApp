@@ -6,7 +6,6 @@ import HomePage from "./pasges/HomePage";
 import SignupPage from './pasges/SignupPage';
 import LoginPage from './pasges/LoginPage';
 
-import SettingsPage from './pasges/SettingsPage';
 import ProfilePage from './pasges/ProfilePage';
 
 import  { Routes,Route, BrowserRouter, Navigate } from 'react-router-dom';
@@ -17,7 +16,9 @@ import {Loader} from "lucide-react";
 import { Toaster } from 'react-hot-toast';
 
 function App() {
-  const {authUser , checkAuth , isCheckingAuth} = useAuthStore();
+  const {authUser , checkAuth , isCheckingAuth,onlineUsers} = useAuthStore();
+
+  console.log({onlineUsers});
 
   useEffect(()=>{
     checkAuth();
@@ -32,20 +33,19 @@ function App() {
   )
 
   return (
-    <>
+    <div data-theme="retro">
     <BrowserRouter>
      <Navbar/>
      <Routes>
         <Route path='/' element={authUser ? <HomePage /> :  <Navigate to="/login" />} />
         <Route path='/signup' element={!authUser ? <SignupPage /> : <Navigate to="/" />} />
         <Route path='/login' element={ !authUser ? <LoginPage /> : <Navigate to="/" />} />
-        <Route path='/setting' element={<SettingsPage />} />
         <Route path='/profile' element={authUser ? <ProfilePage />:  <Navigate to="/login" />} />
      </Routes>
 
      <Toaster/>
      </BrowserRouter>
-    </>
+     </div>
   )
 }
 
