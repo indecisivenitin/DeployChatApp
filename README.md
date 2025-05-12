@@ -122,4 +122,4 @@ This project is licensed under the ISC License.
 - Socket.io for real-time communication
 - Tailwind CSS for styling
 - Vite for the build tool
-- All contributors and users of the application
+- All contributors and users of the application 
