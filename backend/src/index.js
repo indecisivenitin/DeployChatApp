@@ -8,7 +8,7 @@ import { fileURLToPath } from "url";
 import { connectDB } from "./lib/db.js";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
-import { app, server } from "./lib/socket.js";
+import { app, server } from "./lib/socket.js"; // ensure app is express()
 
 dotenv.config();
 
@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: process.env.CLIENT_URL, // e.g., https://your-frontend.netlify.app
     credentials: true,
   })
 );
@@ -30,18 +30,25 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
-// Production static files
+// Serve frontend in production
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+  const frontendPath = path.join(__dirname, "../frontend/dist");
+  app.use(express.static(frontendPath));
 
-  // ✅ Fixed: use "*" instead of "(.*)"
+  // Catch-all route for SPA
   app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+    res.sendFile(path.join(frontendPath, "index.html"));
   });
 }
 
-// Start server
-server.listen(PORT, () => {
-  console.log("Server is running on PORT:" + PORT);
-  connectDB();
-});
+// Connect DB first, then start server
+connectDB()
+  .then(() => {
+    server.listen(PORT, () => {
+      console.log(`Server is running on PORT: ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Database connection failed:", err);
+    process.exit(1);
+  });
