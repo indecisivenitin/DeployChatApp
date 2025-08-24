@@ -13,9 +13,11 @@ import messageRoutes from "./routes/message.route.js";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 5000;
+// Paths and PORT
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const PORT = process.env.PORT || 5000;
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 
 // Express app
 const app = express();
@@ -24,13 +26,19 @@ const server = http.createServer(app);
 // Socket.io setup
 const io = new Server(server, {
   cors: {
-    origin: [process.env.CLIENT_URL], // frontend URL
+    origin: CLIENT_URL,
     credentials: true,
   },
 });
 
+// Map to store online users
 const userSocketMap = {};
+export function getReceiverSocketId(userId) {
+  return userSocketMap[userId];
+}
+export { io };
 
+// Socket.io connection
 io.on("connection", (socket) => {
   console.log("A user connected", socket.id);
 
@@ -46,19 +54,15 @@ io.on("connection", (socket) => {
   });
 });
 
-export function getReceiverSocketId(userId) {
-  return userSocketMap[userId];
-}
-
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
-  app.use(
-    cors({
-      origin: process.env.CLIENT_URL,
-      credentials: true,
-    })
-  );
+app.use(
+  cors({
+    origin: CLIENT_URL,
+    credentials: true,
+  })
+);
 
 // Routes
 app.use("/api/auth", authRoutes);
